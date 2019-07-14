@@ -1,0 +1,27 @@
+from flask import Flask, request,render_template
+import pandas as pd
+from itertools import chain
+
+app = Flask(__name__)
+
+sheets = []
+jsonfileconver = []
+wb = pd.ExcelFile('Invoice-Example.xlsx')
+sheets = pd.read_excel('Invoice-Example.xlsx', sheet_name=wb.sheet_names)
+for i in wb.sheet_names:
+    jsonfileconver.append(sheets[i].to_json(orient='columns'))
+
+newlist = chain.from_iterable(jsonfileconver[0])
+print(list(newlist))
+
+@app.route("/")
+def files():
+    return "<h1>hello harpreet</h1>"
+
+@app.route("/clients",methods=['GET'])
+def template():
+    return render_template("clients.html",data=jsonfileconver[0])
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True)
